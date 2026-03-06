@@ -10,6 +10,11 @@ export default function HotelCard({ hotel, checkIn, checkOut, guests = 2, rooms 
     competitors,
   } = hotel;
 
+  const nights = checkIn && checkOut
+    ? Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000)
+    : 0;
+  const totalPrice = nights > 0 ? pricePerNight * nights : null;
+
   const handleBook = () => {
     const url = buildHotelUrl(hotel, checkIn, checkOut, guests, rooms);
     window.open(url, '_blank', 'noopener,noreferrer');
@@ -89,9 +94,14 @@ export default function HotelCard({ hotel, checkIn, checkOut, guests = 2, rooms 
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-slate-800">{formatPrice(pricePerNight)}</p>
-            <p className="text-xs text-slate-400 mb-1">par nuit</p>
+            <p className="text-xs text-slate-400">par nuit</p>
+            {totalPrice && (
+              <p className="text-sm font-semibold text-violet-700 mt-0.5">
+                {formatPrice(totalPrice)} total · {nights} nuit{nights > 1 ? 's' : ''}
+              </p>
+            )}
             {competitors && (
-              <div className="mb-2">
+              <div className="mb-2 mt-1">
                 <PriceComparisonBadge ourPrice={pricePerNight} competitors={competitors} />
               </div>
             )}

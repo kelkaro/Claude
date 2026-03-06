@@ -10,6 +10,11 @@ export default function CarCard({ car, pickupDate, returnDate, pickupTime = '10:
     cancellation, mileage, minAge, competitors,
   } = car;
 
+  const days = pickupDate && returnDate
+    ? Math.round((new Date(returnDate) - new Date(pickupDate)) / 86400000)
+    : 0;
+  const totalPrice = days > 0 ? pricePerDay * days : null;
+
   const handleBook = () => {
     const url = buildCarUrl(car, pickupDate, returnDate, pickupTime, returnTime);
     window.open(url, '_blank', 'noopener,noreferrer');
@@ -84,9 +89,14 @@ export default function CarCard({ car, pickupDate, returnDate, pickupTime = '10:
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-slate-800">{formatPrice(pricePerDay)}</p>
-            <p className="text-xs text-slate-400 mb-1">par jour</p>
+            <p className="text-xs text-slate-400">par jour</p>
+            {totalPrice && (
+              <p className="text-sm font-semibold text-emerald-700 mt-0.5">
+                {formatPrice(totalPrice)} total · {days} jour{days > 1 ? 's' : ''}
+              </p>
+            )}
             {competitors && (
-              <div className="mb-2">
+              <div className="mb-2 mt-1">
                 <PriceComparisonBadge ourPrice={pricePerDay} competitors={competitors} />
               </div>
             )}
