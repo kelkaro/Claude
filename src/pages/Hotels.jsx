@@ -48,7 +48,7 @@ export default function Hotels() {
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    runSearch({ city: cityObj?.city || cityText, minStars, maxPrice });
+    runSearch({ city: cityObj?.city || cityText, minStars, maxPrice, checkIn, checkOut, adults: guests });
   };
 
   const handleQuickSearch = (city) => {

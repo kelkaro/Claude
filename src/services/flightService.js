@@ -1,26 +1,52 @@
 /**
  * Flight Service
- * Swap mock logic with real API (Amadeus, Skyscanner…) here.
+ * Tries Amadeus API first (via /api/flights Vercel function),
+ * then falls back to mock data if API is unavailable.
  */
 import { mockFlights, generateDatePrices } from '../data/flights';
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+const isIata = (s) => /^[A-Z]{3}$/i.test(s?.trim());
 
 /**
  * Search flights.
- * params.fromIatas – string[] IATA codes for radius multi-airport search
- * params.from      – free-text city / IATA (single origin)
- * params.to        – free-text city / IATA
+ * params.from      – IATA code or city name
+ * params.fromIatas – string[] IATA codes (nearby-airport mode)
+ * params.to        – IATA code or city name
+ * params.date      – YYYY-MM-DD departure date
+ * params.adults    – number of passengers
  * params.class     – cabin class filter
  */
 export async function searchFlights(params) {
+  const origin = params.fromIatas?.[0] || params.from;
+  const dest   = params.to;
+
+  /* ── Try Amadeus API if both origin & dest are IATA codes ── */
+  if (origin && dest && params.date && isIata(origin) && isIata(dest)) {
+    try {
+      const q = new URLSearchParams({
+        origin:      origin.toUpperCase(),
+        destination: dest.toUpperCase(),
+        date:        params.date,
+        adults:      String(params.adults || 1),
+        ...(params.class && params.class !== 'Any' ? { cabin: params.class } : {}),
+      });
+
+      const res = await fetch(`/api/flights?${q}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) return data;
+      }
+    } catch (e) {
+      console.warn('Amadeus flight search failed, using mock data:', e.message);
+    }
+  }
+
+  /* ── Fallback: mock data ── */
   await delay(650);
   let results = [...mockFlights];
 
-  // Helper: detect 3-letter IATA codes → use exact match
-  const isIata = (s) => /^[A-Z]{3}$/i.test(s.trim());
-
-  if (params.fromIatas && params.fromIatas.length > 0) {
+  if (params.fromIatas?.length > 0) {
     results = results.filter((f) => params.fromIatas.includes(f.from.code));
   } else if (params.from) {
     const q = params.from.trim();
@@ -29,9 +55,7 @@ export async function searchFlights(params) {
     } else {
       const ql = q.toLowerCase();
       results = results.filter(
-        (f) =>
-          f.from.city.toLowerCase().includes(ql) ||
-          f.from.code.toLowerCase().includes(ql)
+        (f) => f.from.city.toLowerCase().includes(ql) || f.from.code.toLowerCase().includes(ql)
       );
     }
   }
@@ -43,9 +67,7 @@ export async function searchFlights(params) {
     } else {
       const ql = q.toLowerCase();
       results = results.filter(
-        (f) =>
-          f.to.city.toLowerCase().includes(ql) ||
-          f.to.code.toLowerCase().includes(ql)
+        (f) => f.to.city.toLowerCase().includes(ql) || f.to.code.toLowerCase().includes(ql)
       );
     }
   }
