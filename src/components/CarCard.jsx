@@ -3,7 +3,7 @@ import { formatPrice } from '../utils/formatters';
 import { buildCarUrl } from '../utils/bookingLinks';
 import PriceComparisonBadge from './PriceComparisonBadge';
 
-export default function CarCard({ car, pickupDate, returnDate }) {
+export default function CarCard({ car, pickupDate, returnDate, pickupTime = '10:00', returnTime = '10:00' }) {
   const {
     company, name, category, seats, bags, doors, transmission,
     airConditioning, pricePerDay, location, image, features,
@@ -11,7 +11,7 @@ export default function CarCard({ car, pickupDate, returnDate }) {
   } = car;
 
   const handleBook = () => {
-    const url = buildCarUrl(car, pickupDate, returnDate);
+    const url = buildCarUrl(car, pickupDate, returnDate, pickupTime, returnTime);
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 

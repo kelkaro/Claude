@@ -9,6 +9,15 @@ import { cities } from '../data/cities';
 
 const sortOptions = ['Price', 'Category'];
 
+const timeOptions = [];
+for (let h = 0; h < 24; h++) {
+  for (const m of [0, 15, 30, 45]) {
+    const hh = String(h).padStart(2, '0');
+    const mm = String(m).padStart(2, '0');
+    timeOptions.push(`${hh}:${mm}`);
+  }
+}
+
 export default function Cars() {
   const [cityText,    setCityText]    = useState('');
   const [cityObj,     setCityObj]     = useState(null);
@@ -128,12 +137,13 @@ export default function Cars() {
                 <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wide">Pickup time</label>
                 <div className="relative">
                   <Clock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                  <input
-                    type="time"
+                  <select
                     className="input-field pl-9"
                     value={pickupTime}
                     onChange={(e) => setPickupTime(e.target.value)}
-                  />
+                  >
+                    {timeOptions.map((t) => <option key={t} value={t}>{t}</option>)}
+                  </select>
                 </div>
               </div>
               <div>
@@ -154,12 +164,13 @@ export default function Cars() {
                 <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wide">Return time</label>
                 <div className="relative">
                   <Clock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                  <input
-                    type="time"
+                  <select
                     className="input-field pl-9"
                     value={returnTime}
                     onChange={(e) => setReturnTime(e.target.value)}
-                  />
+                  >
+                    {timeOptions.map((t) => <option key={t} value={t}>{t}</option>)}
+                  </select>
                 </div>
               </div>
             </div>
@@ -277,7 +288,7 @@ export default function Cars() {
               </div>
             ) : (
               <div className="space-y-4">
-                {sorted.map((c) => <CarCard key={c.id} car={c} pickupDate={pickupDate} returnDate={returnDate} />)}
+                {sorted.map((c) => <CarCard key={c.id} car={c} pickupDate={pickupDate} returnDate={returnDate} pickupTime={pickupTime} returnTime={returnTime} />)}
               </div>
             )}
           </>

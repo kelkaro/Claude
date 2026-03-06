@@ -84,44 +84,44 @@ const CITY_IATA = {
 };
 
 const COMPANY_URL_BUILDERS = {
-  'DiscoverCars': (iata, pickup, ret) =>
-    `https://www.discovercars.com/search?location=${iata}&dateFrom=${pickup}T10:00&dateTo=${ret}T10:00`,
+  'DiscoverCars': (iata, pickup, ret, pTime, rTime) =>
+    `https://www.discovercars.com/search?location=${iata}&dateFrom=${pickup}T${pTime}&dateTo=${ret}T${rTime}`,
 
-  'Hertz': (iata, pickup, ret) =>
-    `https://www.hertz.fr/rentacar/reservation/?from=${iata}&fromDate=${pickup}&toDate=${ret}`,
+  'Hertz': (iata, pickup, ret, pTime, rTime) =>
+    `https://www.hertz.fr/rentacar/reservation/?from=${iata}&fromDate=${pickup}&fromTime=${pTime}&toDate=${ret}&toTime=${rTime}`,
 
-  'Sixt': (iata, pickup, ret) =>
-    `https://www.sixt.fr/location-voiture/?station=${iata}&dateFrom=${pickup}&dateTo=${ret}`,
+  'Sixt': (iata, pickup, ret, pTime, rTime) =>
+    `https://www.sixt.fr/location-voiture/?station=${iata}&dateFrom=${pickup}&timeFrom=${pTime}&dateTo=${ret}&timeTo=${rTime}`,
 
-  'Avis': (iata, pickup, ret) =>
-    `https://www.avis.fr/location-voiture/?from=${iata}&fromDate=${pickup}&toDate=${ret}`,
+  'Avis': (iata, pickup, ret, pTime, rTime) =>
+    `https://www.avis.fr/location-voiture/?from=${iata}&fromDate=${pickup}&fromTime=${pTime}&toDate=${ret}&toTime=${rTime}`,
 
-  'Enterprise': (iata, pickup, ret) =>
-    `https://www.enterprise.fr/fr/location-voiture/locations.html?fromDate=${pickup}&toDate=${ret}`,
+  'Enterprise': (iata, pickup, ret, pTime, rTime) =>
+    `https://www.enterprise.fr/fr/location-voiture/locations.html?fromDate=${pickup}&fromTime=${pTime}&toDate=${ret}&toTime=${rTime}`,
 
-  'Sunny Cars': (iata, pickup, ret) =>
-    `https://www.sunnycars.fr/search?station=${iata}&from=${pickup}&to=${ret}`,
+  'Sunny Cars': (iata, pickup, ret, pTime, rTime) =>
+    `https://www.sunnycars.fr/search?station=${iata}&from=${pickup}&fromTime=${pTime}&to=${ret}&toTime=${rTime}`,
 
-  'VIPCars': (iata, pickup, ret) =>
-    `https://www.vipcars.com/car-hire/${iata}?pickupDate=${pickup}&dropoffDate=${ret}`,
+  'VIPCars': (iata, pickup, ret, pTime, rTime) =>
+    `https://www.vipcars.com/car-hire/${iata}?pickupDate=${pickup}&pickupTime=${pTime}&dropoffDate=${ret}&dropoffTime=${rTime}`,
 
-  'Orbit Car Hire': (iata, pickup, ret) =>
-    `https://www.orbitcarhire.com/car-hire/${iata}?from=${pickup}&to=${ret}`,
+  'Orbit Car Hire': (iata, pickup, ret, pTime, rTime) =>
+    `https://www.orbitcarhire.com/car-hire/${iata}?from=${pickup}&fromTime=${pTime}&to=${ret}&toTime=${rTime}`,
 
-  'Rentalcars': (iata, pickup, ret) =>
-    `https://www.rentalcars.com/fr/airport/search/?pickUpLocation=${iata}&pickUpDate=${pickup}&dropOffDate=${ret}`,
+  'Rentalcars': (iata, pickup, ret, pTime, rTime) =>
+    `https://www.rentalcars.com/fr/airport/search/?pickUpLocation=${iata}&pickUpDate=${pickup}&pickUpTime=${pTime}&dropOffDate=${ret}&dropOffTime=${rTime}`,
 };
 
-export function buildCarUrl(car, pickupDate, returnDate) {
+export function buildCarUrl(car, pickupDate, returnDate, pickupTime = '10:00', returnTime = '10:00') {
   if (!pickupDate || !returnDate) return car.bookingUrl || 'https://www.jetcost.com/location-voiture/';
 
   const iata = CITY_IATA[car.city] || car.city;
   const builder = COMPANY_URL_BUILDERS[car.company];
 
-  if (builder) return builder(iata, pickupDate, returnDate);
+  if (builder) return builder(iata, pickupDate, returnDate, pickupTime, returnTime);
 
-  // Default: Jetcost deep link (exact same format as in the screenshot URL)
-  return `https://www.jetcost.com/location-voiture/results/${iata}/${pickupDate}/10:00/${iata}/${returnDate}/10:00`;
+  // Default: Jetcost deep link
+  return `https://www.jetcost.com/location-voiture/results/${iata}/${pickupDate}/${pickupTime}/${iata}/${returnDate}/${returnTime}`;
 }
 
 /* ─── HOTELS ─── */
